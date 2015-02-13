@@ -32,7 +32,7 @@ whiptail --clear --title "CONVERT KODIBUNTU IN KODISERVER" \
 		     echo "Installing the necessary dependencies and downloading the necessary files to install KODIServer"
 			$inst git-core
 			{
-			$git https://github.com/tnds82/kodiserver.git ~/kodiserver --progress 2>&1
+			$git https://github.com/tnds82/xbmcserver.git ~/kodiserver --progress 2>&1
                          for ((i = 0 ; i <= 100 ; i+=5)); do
                                 sleep 0.4
                                 echo $i
@@ -258,6 +258,7 @@ do
 		$inst vdr-plugin-restfulapi -y
 		$inst vdr-plugin-live -y
 		$repo ppa:aap/vdr
+		$repo ppa:aap/vdr-testing
 		$update
 		$inst vdr-plugin-dvbapi -y
 		$inst vdr-plugin-wirbelscan -y
@@ -371,9 +372,13 @@ do
                 $change "40 i\preroot_root=bootstrap" /etc/webmin/miniserv.conf
 	   ;;
 	17)
-	   echo "Installing Steam very soon"
-#		$inst wmctrl
-#		wget http://media.steampowered.com/client/installer/steam.deb && sudo dpkg -i steam.deb
+	   echo "Installing Steam"
+		$inst wmctrl
+		wget http://media.steampowered.com/client/installer/steam.deb && sudo dpkg -i steam.deb
+		sudo cp /usr/share/xsessions/hidden/openbox.desktop /usr/share/xsessions/
+		sudo dbus-send --system --type=method_call --print-reply --dest=org.freedesktop.Accounts /org/freedesktop/Accounts/User1000 org.freedesktop.Accounts.User.SetXSession string:openbox
+		mkdir -p $HOME/.config/openbox/ && echo "export DISPLAY=:0" >> $HOME/.config/openbox/autostart.sh && echo "xsetroot -solid black &" >> $HOME/.config/openbox/autostart.sh && echo "/usr/bin/kodi &" >> $HOME/.config/openbox/autostart.sh && chmod +x $HOME/.config/openbox/autostart.sh
+
 #		sudo mv /usr/share/xsessions/openbox.desktop.dis /usr/share/xsessions/openbox.desktop
 #		$change "s/user-session=/user-session=Openbox/g" /etc/lightdm/lightdm.conf
 #		mkdir -p $HOME/.config/openbox/ && echo "export DISPLAY=:0" >> $HOME/.config/openbox/autostart.sh && echo "xsetroot -solid black &" >> $HOME/.config/openbox/autostart.sh && echo "/usr/bin/xbmc &" >> $HOME/.config/openbox/autostart.sh && chmod +x $HOME/.config/openbox/autostart.sh
