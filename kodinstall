@@ -32,7 +32,7 @@ whiptail --clear --title "CONVERT KODIBUNTU IN KODISERVER" \
 		     echo "Installing the necessary dependencies and downloading the necessary files to install KODIServer"
 			$inst git-core
 			{
-			$git https://github.com/tnds82/xbmcserver.git ~/kodiserver --progress 2>&1
+			$git https://github.com/tnds82/kodiserver.git ~/kodiserver --progress 2>&1
                          for ((i = 0 ; i <= 100 ; i+=5)); do
                                 sleep 0.4
                                 echo $i
@@ -66,26 +66,21 @@ username=`cat /tmp/resposta.tmp`
 whiptail --inputbox "Put yout ip KODIBuntu (ex: 10.0.1.2)" 10 60 "" 2> /tmp/resposta1.tmp
 ip=`cat /tmp/resposta1.tmp`
 
-cmd=(whiptail --separate-output  --title "PROGRAMS TO INSTALL ON KODISERVER" --checklist "Choose the programs you want to install" 24 60 18)
-options=(1 "Install Couchpotato" off    # any option can be set to default to "on"
-         2 "Install SickRage" off
-         3 "Install Headphones" off
-         4 "Install Mylar" off
-         5 "Install XDM" off
-         6 "Install Plex Media Server" off
-         7 "Install PlexConnect" off
-         8 "Install Firmware Tevii S471" off
-         9 "Install TVHeadend" off
-         10 "Install Oscam" off
-         11 "Install VDR" off
-         12 "Install Diseqc for VDR" off
-         13 "Convert your enigma2 channels list for VDR " off
-         14 "Install Transmission" off
-         15 "Install DVB Card Sundtek" off
-	 16 "Install Webmin" off
-	 17 "Install Steam - comming soon" off
-	 18 "Install OwnCloud" off)
-
+cmd=(whiptail --separate-output  --title "PROGRAMS TO INSTALL ON KODISERVER" --checklist "Select Options:" 21 42 14)
+options=(1 "COUCHPOTATO " off    # any option can be set to default to "on"
+         2 "SICKRAGE " off
+         3 "HEADPHONES " off
+         4 "MYLAR " off
+         5 "XDM " off
+         6 "PLEX MENU " off
+	 7 "DVB / GRAPHICS CARDS " off
+         8 "TVHeadend " off
+         9 "OSCAM " off
+	 10 "VDR MENU " off
+         11 "TRANSMISSION " off
+	 12 "WEBMIN " off
+	 13 "STEAM - COMMING SOON " off
+	 14 "OWNCLOUD" off)
 choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
 clear
 for choice in $choices
@@ -130,7 +125,6 @@ do
              done
          } | whiptail --gauge "Installing HeadPhones" 6 50 0
 	    ;;
-
        4)
 	 {
 		$git https://github.com/evilhero/mylar -b development /opt/mylar --progress 2>&1
@@ -157,46 +151,81 @@ do
              done
          } | whiptail --gauge "Installing XDM" 6 50 0
             ;;
-       6)
-	   echo "Installing Plex Media Server"
-		sudo curl http://shell.ninthgate.se/packages/shell-ninthgate-se-keyring.key | sudo apt-key add -
-		sudo echo "deb http://www.deb-multimedia.org wheezy main non-free" | sudo tee -a /etc/apt/sources.list.d/deb-multimedia.list
-		sudo echo "deb http://shell.ninthgate.se/packages/debian wheezy main" | sudo tee -a /etc/apt/sources.list.d/plex.list
-		$update
-		$inst deb-multimedia-keyring --force-yes
-		$update
+	6)
+cmd=(whiptail --separate-output --title "PLEX MENU" --checklist "Select options to Plex" 10 35 2)
+options=(1 "PLEX MEDIA SERVER " off    # any option can be set to default to "on"
+         2 "PLEX CONNECT " off)
+choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+clear
+for choice in $choices
+do
+    case $choice in
+        1)
+            echo "Installing Plex Media Server"
+                sudo curl http://shell.ninthgate.se/packages/shell-ninthgate-se-keyring.key | sudo apt-key add -
+                sudo echo "deb http://www.deb-multimedia.org wheezy main non-free" | sudo tee -a /etc/apt/sources.list.d/deb-multimedia.list
+                sudo echo "deb http://shell.ninthgate.se/packages/debian wheezy main" | sudo tee -a /etc/apt/sources.list.d/plex.list
+                $update
+                $inst deb-multimedia-keyring --force-yes
+                $update
                 $inst plexmediaserver
 		$copy -r ~/kodiserver/plexmediaserver/addons/*.bundle "/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Plug-ins"
-	    ;;
-       7)
-	 {
-		$git https://github.com/iBaa/PlexConnect.git /opt/plexconnect --progress 2>&1
-		$chow $username:$username -R /opt/plexconnect
-		$copy -r ~/kodiserver/plexconnect/trailers.* /opt/plexconnect/assets/certificates
-		python /opt/plexconnect/PlexConnect.py -some Parameters >> /opt/plexconnect/Logfile_stout.log 2>&1 &
-		sleep 30
-		jobs
-		kill %1
-		kill -9 %1
-		jobs
-		$change "s@certfile = ./assets/certificates/trailers.pem@certfile = /opt/plexconnect/assets/certificates/trailers.pem@g" /opt/plexconnect/Settings.cfg
-		$change "s/enable_plexgdm = True/enable_plexgdm = False/g" /opt/plexconnect/Settings.cfg
-		$change "s/enable_plexconnect_autodetect = True/enable_plexconnect_autodetect = False/g" /opt/plexconnect/Settings.cfg
-		$change 's/ip_pms = 192.168.178.10/ip_pms = '$ip'/g' /opt/plexconnect/Settings.cfg
-		$change 's/ip_plexconnect = 0.0.0.0/ip_plexconnect = '$ip'/g' /opt/plexconnect/Settings.cfg
-		$copy ~/kodiserver/autostart/plexconnect.conf /etc/init
-	     for ((i = 0 ; i <= 100 ; i+=5)); do
+            ;;
+        2)
+            echo "INSTALLING PLEX CONNECT"
+	  {
+                $git https://github.com/iBaa/PlexConnect.git /opt/plexconnect --progress 2>&1
+                $chow $username:$username -R /opt/plexconnect
+                $copy -r ~/kodiserver/plexconnect/trailers.* /opt/plexconnect/assets/certificates
+                python /opt/plexconnect/PlexConnect.py -some Parameters >> /opt/plexconnect/Logfile_stout.log 2>&1 &
+                sleep 30
+                jobs
+                kill %1
+                kill -9 %1
+                jobs
+                $change "s@certfile = ./assets/certificates/trailers.pem@certfile = /opt/plexconnect/assets/certificates/trailers.pem@g" /opt/plexconnect/Settings.cfg
+                $change "s/enable_plexgdm = True/enable_plexgdm = False/g" /opt/plexconnect/Settings.cfg
+                $change "s/enable_plexconnect_autodetect = True/enable_plexconnect_autodetect = False/g" /opt/plexconnect/Settings.cfg
+                $change 's/ip_pms = 192.168.178.10/ip_pms = '$ip'/g' /opt/plexconnect/Settings.cfg
+                $change 's/ip_plexconnect = 0.0.0.0/ip_plexconnect = '$ip'/g' /opt/plexconnect/Settings.cfg
+                $copy ~/kodiserver/autostart/plexconnect.conf /etc/init
+             for ((i = 0 ; i <= 100 ; i+=5)); do
                 sleep 0.2
                 echo $i
              done
-         } | whiptail --gauge "Installing PlexConnect" 6 50 0
-	    ;;
-       8)
-	   echo "Updating Firware Tevii S471"
+          } | whiptail --gauge "Installing PlexConnect" 6 50 0
+            ;;
+    esac
+done
+	  ;;
+	7)
+cmd=(whiptail --separate-output --title "Drivers DVB Cards and Graphics Cards" --checklist "Select your Card" 10 50 3)
+options=(1 "Install Firmware Tevii S471 " off    # any option can be set to default to "on"
+         2 "Install Driver Sundtek " off
+         3 "Install Driver Nvidia " off)
+choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+clear
+for choice in $choices
+do
+    case $choice in
+        1)
+            echo "Updating Firware Tevii S471"
 		sudo unrar x ~/kodiserver/teviiS471/dvb-fe-ds3000.rar /lib/firmware
-	   ;;
-	9)
-	   echo "Installing TVHeadend"
+            ;;
+        2)
+            echo "Installing DVB CARD Sundtek"
+                sudo chmod 755 ~/kodiserver/sundtek/sundtek_netinst.sh
+                sudo ~/kodiserver/sundtek/sundtek_netinst.sh
+            ;;
+        3)
+            echo "Installing Driver Nvidia"
+		$inst nvidia-331-updates
+            ;;
+    esac
+done
+	    ;;
+	8)
+	    echo "Installing TVHeadend"
 		curl http://apt.tvheadend.org/repo.gpg.key | sudo apt-key add -
 		$repo -r http://apt.tvheadend.org/stable
 		$repo http://apt.tvheadend.org/unstable
@@ -204,7 +233,7 @@ do
 		$inst tvheadend -y
 		$inst kodi-pvr-tvheadend-hts
 	   ;;
-	10)
+	9)
 	   echo "Installing Oscam"
 		whiptail --inputbox "USERNAME FOR OSCAM (ex: test)" 10 60 "" 2> /tmp/resposta2.tmp
 		oscamu=`cat /tmp/resposta2.tmp`
@@ -228,87 +257,100 @@ do
 		$change 's/"user"/'$oscamu'/g' /usr/local/etc/oscam.conf
 		$change 's/"pass"/'$oscamp'/g' /usr/local/etc/oscam.conf
 	   ;;
-	11)
-	   echo "Installing VDR"
-		whiptail --inputbox "USERNAME FOR VDRADMIN (ex: test)" 10 60 "" 2> /tmp/resposta4.tmp
-		 vdru=`cat /tmp/resposta4.tmp`
+	10)
+cmd=(whiptail --separate-output --title "VDR MENU" --checklist "Select options to VDR" 10 60 3)
+options=(1 "Install VDR " off    # any option can be set to default to "on"
+	 2 "Install Diseqc for VDR " off
+         3 "Convert your enigma2 channels list for VDR " off)
+choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+clear
+for choice in $choices
+do
+    case $choice in
+        1)
+            echo "Installing VDR"
+                whiptail --inputbox "USERNAME FOR VDRADMIN (ex: test)" 10 60 "" 2> /tmp/resposta4.tmp
+                 vdru=`cat /tmp/resposta4.tmp`
 
-		whiptail --passwordbox "PASSWORD FOR VDRADMIN (ex: test)" 10 60 "" 2> /tmp/resposta5.tmp
-		 vdrp=`cat /tmp/resposta5.tmp`
+                whiptail --passwordbox "PASSWORD FOR VDRADMIN (ex: test)" 10 60 "" 2> /tmp/resposta5.tmp
+                 vdrp=`cat /tmp/resposta5.tmp`
 
-		whiptail --inputbox "IP OSCAM (ex: 10.0.1.3)" 10 60 "" 2> /tmp/resposta13.tmp
-		 iposcam=`cat /tmp/resposta13.tmp`
+                whiptail --inputbox "IP OSCAM (ex: 10.0.1.3)" 10 60 "" 2> /tmp/resposta13.tmp
+                 iposcam=`cat /tmp/resposta13.tmp`
 
-		whiptail --inputbox "OSCAM DVBAPI PORT (ex: 9000)" 10 60 "" 2> /tmp/resposta14.tmp
-		 portoscam=`cat /tmp/resposta14.tmp`
+                whiptail --inputbox "OSCAM DVBAPI PORT (ex: 9000)" 10 60 "" 2> /tmp/resposta14.tmp
+                 portoscam=`cat /tmp/resposta14.tmp`
 
-		$repo ppa:yavdr/unstable-vdr
-		$update
-		sudo echo "Package: *" | sudo tee -a /etc/apt/preferences.d/yavdr-unstable-vdr
+                $repo ppa:yavdr/unstable-vdr
+                $update
+                sudo echo "Package: *" | sudo tee -a /etc/apt/preferences.d/yavdr-unstable-vdr
                 sudo echo "Pin: release o=LP-PPA-yavdr-unstable-vdr" | sudo tee -a /etc/apt/preferences.d/yavdr-unstable-vdr
                 sudo echo "Pin-Priority: 1000" | sudo tee -a /etc/apt/preferences.d/yavdr-unstable-vdr
-		$update
-		$inst vdr -y
-		$inst dvb-apps -y
+                $update
+                $inst vdr -y
+                $inst dvb-apps -y
 		$inst vdr-plugin-streamdev-server -y
-		$inst vdr-plugin-streamdev-client -y
-		$inst vdradmin-am -y
-		$inst vdr-plugin-vnsiserver -y
-		$inst vdr-plugin-xvdr -y
-		$inst vdr-plugin-restfulapi -y
-		$inst vdr-plugin-live -y
-		$repo ppa:aap/vdr
-		$repo ppa:aap/vdr-testing
-		$update
-		$inst vdr-plugin-dvbapi -y
-		$inst vdr-plugin-wirbelscan -y
-		$change "9 i\# Options that will correct channels list" /etc/default/vdr
-		$change '10 i\export VDR_CHARSET_OVERRIDE="ISO-8859-1"' /etc/default/vdr
-		$change '11 i\export LANG="pt_PT.UTF-8"' /etc/default/vdr
-		$change "12 i\ " /etc/default/vdr
-		$change "s/ENABLED=0/ENABLED=1/g" /etc/default/vdr
-		$change 's/ENABLED="0"/ENABLED="1"/g' /etc/default/vdradmin-am
-		$change 's/USERNAME = linvdr/USERNAME = '$vdru'/g' /var/lib/vdradmin-am/vdradmind.conf
-		$change 's/PASSWORD = linvdr/PASSWORD = '$vdrp'/g' /var/lib/vdradmin-am/vdradmind.conf
-		$change "s/#204.152.189.113/204.152.189.113/g" /var/lib/vdr/plugins/xvdr/allowed_hosts.conf
+                $inst vdr-plugin-streamdev-client -y
+                $inst vdradmin-am -y
+                $inst vdr-plugin-vnsiserver -y
+                $inst vdr-plugin-xvdr -y
+                $inst vdr-plugin-restfulapi -y
+                $inst vdr-plugin-live -y
+                $repo ppa:aap/vdr
+                $repo ppa:aap/vdr-testing
+                $update
+                $inst vdr-plugin-dvbapi -y
+                $inst vdr-plugin-wirbelscan -y
+                $change "9 i\# Options that will correct channels list" /etc/default/vdr
+                $change '10 i\export VDR_CHARSET_OVERRIDE="ISO-8859-1"' /etc/default/vdr
+                $change '11 i\export LANG="pt_PT.UTF-8"' /etc/default/vdr
+                $change "12 i\ " /etc/default/vdr
+                $change "s/ENABLED=0/ENABLED=1/g" /etc/default/vdr
+                $change 's/ENABLED="0"/ENABLED="1"/g' /etc/default/vdradmin-am
+                $change 's/USERNAME = linvdr/USERNAME = '$vdru'/g' /var/lib/vdradmin-am/vdradmind.conf
+                $change 's/PASSWORD = linvdr/PASSWORD = '$vdrp'/g' /var/lib/vdradmin-am/vdradmind.conf
+                $change "s/#204.152.189.113/204.152.189.113/g" /var/lib/vdr/plugins/xvdr/allowed_hosts.conf
 		$change "s@#0.0.0.0/0@0.0.0.0/0@g" /var/lib/vdr/plugins/xvdr/allowed_hosts.conf
-		$change "s/#204.152.189.113/204.152.189.113/g" /etc/vdr/plugins/vnsiserver/allowed_hosts.conf
-		$change "s@#0.0.0.0/0@0.0.0.0/0@g" /etc/vdr/plugins/vnsiserver/allowed_hosts.conf
-		$change '16 i\dvbapi' /etc/vdr/plugins/order.conf
-		$change "s@#192.168.100.0/24@192.168.100.0/24@g" /etc/vdr/plugins/streamdevhosts.conf
-		$change "s/#204.152.189.113/204.152.189.113/g" /etc/vdr/plugins/streamdevhosts.conf
-		$change "s@#239.255.0.0/16@239.255.0.0/16@g" /etc/vdr/plugins/streamdevhosts.conf
-		$change "s@#0.0.0.0/0@0.0.0.0/0@g" /etc/vdr/plugins/streamdevhosts.conf
-		$change "s@#192.168.100.0/24@192.168.100.0/24@g" /etc/vdr/svdrphosts.conf
-		$change "s/#204.152.189.113/204.152.189.113/g" /etc/vdr/svdrphosts.conf
-		$change "s@#0.0.0.0/0@0.0.0.0/0@g" /etc/vdr/svdrphosts.conf
-		sudo /etc/init.d/vdr start
-		echo "Hello, I'm sleeping for 20 seconds to VDR start"
-		sleep 15s
-		echo "all Done."
-		sudo /etc/init.d/vdr stop
-		$change "100 i\dvbapi.OSCamHost = $iposcam" /var/lib/vdr/setup.conf
-		$change '101 i\dvbapi.OSCamNetwork = 1' /var/lib/vdr/setup.conf
-		$change "102 i\dvbapi.OSCamPort = $portoscam" /var/lib/vdr/setup.conf
-		$copy -r ~/kodiserver/vdr/channels.conf /etc/vdr/
-		$inst kodi-pvr-vdr-vnsi
-	   ;;
-	12)
-	   echo "Configuring your Diseqc for VDR"
-		sudo bash ~/kodiserver/vdr/diseqcsetup_v0.15
-	   ;;
-	13)
-	   echo "Converting your list enigam2 to VDR"
-		whiptail --inputbox "Put the list in onde Folder in Downloads. The name of Folder? (ex: enigma2)" 10 60 "" 2> /tmp/resposta6.tmp
+                $change "s/#204.152.189.113/204.152.189.113/g" /etc/vdr/plugins/vnsiserver/allowed_hosts.conf
+                $change "s@#0.0.0.0/0@0.0.0.0/0@g" /etc/vdr/plugins/vnsiserver/allowed_hosts.conf
+                $change '16 i\dvbapi' /etc/vdr/plugins/order.conf
+                $change "s@#192.168.100.0/24@192.168.100.0/24@g" /etc/vdr/plugins/streamdevhosts.conf
+                $change "s/#204.152.189.113/204.152.189.113/g" /etc/vdr/plugins/streamdevhosts.conf
+                $change "s@#239.255.0.0/16@239.255.0.0/16@g" /etc/vdr/plugins/streamdevhosts.conf
+                $change "s@#0.0.0.0/0@0.0.0.0/0@g" /etc/vdr/plugins/streamdevhosts.conf
+                $change "s@#192.168.100.0/24@192.168.100.0/24@g" /etc/vdr/svdrphosts.conf
+                $change "s/#204.152.189.113/204.152.189.113/g" /etc/vdr/svdrphosts.conf
+                $change "s@#0.0.0.0/0@0.0.0.0/0@g" /etc/vdr/svdrphosts.conf
+                sudo /etc/init.d/vdr start
+                echo "Hello, I'm sleeping for 20 seconds to VDR start"
+                sleep 15s
+                echo "all Done."
+                sudo /etc/init.d/vdr stop
+                $change "100 i\dvbapi.OSCamHost = $iposcam" /var/lib/vdr/setup.conf
+                $change '101 i\dvbapi.OSCamNetwork = 1' /var/lib/vdr/setup.conf
+                $change "102 i\dvbapi.OSCamPort = $portoscam" /var/lib/vdr/setup.conf
+                $copy -r ~/kodiserver/vdr/channels.conf /etc/vdr/
+                $inst kodi-pvr-vdr-vnsi
+            ;;
+        2)
+            echo "Configuring your Diseqc for VDR"
+                sudo bash ~/kodiserver/vdr/diseqcsetup_v0.15
+            ;;
+        3)
+            echo "Converting your list enigam2 to VDR"
+                whiptail --inputbox "Put the list in onde Folder in Downloads. The name of Folder? (ex: enigma2)" 10 60 "" 2> /tmp/resposta6.tmp
                 e2vdr=`cat /tmp/resposta6.tmp`
 
-		sudo mkdir ~/kodiserver/vdr/channels
-		$copy -r ~/Downloads/$e2vdr ~/kodiserver/vdr
-		sudo mv ~/kodiserver/vdr/$e2vdr ~/kodiserver/vdr/e2settings
-		sudo bash ~/kodiserver/vdr/lamedb2vdr.sh ~/kodiserver/vdr/e2settings ~/kodiserver/vdr/channels
-		$copy -r ~/kodiserver/vdr/channels/favorites_channels.conf /etc/vdr/channels.conf
+                sudo mkdir ~/kodiserver/vdr/channels
+                $copy -r ~/Downloads/$e2vdr ~/kodiserver/vdr
+                sudo mv ~/kodiserver/vdr/$e2vdr ~/kodiserver/vdr/e2settings
+                sudo bash ~/kodiserver/vdr/lamedb2vdr.sh ~/kodiserver/vdr/e2settings ~/kodiserver/vdr/channels
+                $copy -r ~/kodiserver/vdr/channels/favorites_channels.conf /etc/vdr/channels.conf
+            ;;
+    esac
+done
 	   ;;
-	14)
+	11)
 	   echo "Installing Transmission"
 		whiptail --inputbox "Location Your Download (ex: /storage/download)" 10 60 "" 2> /tmp/resposta7.tmp
                 tdown=`cat /tmp/resposta7.tmp`
@@ -347,12 +389,7 @@ do
 		$change "492 i\    elif (echo "$1" | grep -q '^magnet:') then" /usr/bin/xdg-open
 		$change "493 i\      transmission-gtk $1" /usr/bin/xdg-open
 	   ;;
-	15)
-	   echo "Installing DVB CARD Sundtek"
-		sudo chmod 755 ~/kodiserver/sundtek/sundtek_netinst.sh
-		sudo ~/kodiserver/sundtek/sundtek_netinst.sh
-	   ;;
-	16)
+	12)
 	   echo " Installing Webmin"
 		sudo echo "# WEBMIN Repository" | sudo tee -a /etc/apt/sources.list
 		sudo echo "deb http://download.webmin.com/download/repository sarge contrib" | sudo tee -a /etc/apt/sources.list
@@ -371,23 +408,15 @@ do
                 $change "39 i\logouttimes=" /etc/webmin/miniserv.conf
                 $change "40 i\preroot_root=bootstrap" /etc/webmin/miniserv.conf
 	   ;;
-	17)
+	13)
 	   echo "Installing Steam"
 		$inst wmctrl
 		wget http://media.steampowered.com/client/installer/steam.deb && sudo dpkg -i steam.deb
 		sudo cp /usr/share/xsessions/hidden/openbox.desktop /usr/share/xsessions/
 		sudo dbus-send --system --type=method_call --print-reply --dest=org.freedesktop.Accounts /org/freedesktop/Accounts/User1000 org.freedesktop.Accounts.User.SetXSession string:openbox
 		mkdir -p $HOME/.config/openbox/ && echo "export DISPLAY=:0" >> $HOME/.config/openbox/autostart.sh && echo "xsetroot -solid black &" >> $HOME/.config/openbox/autostart.sh && echo "/usr/bin/kodi &" >> $HOME/.config/openbox/autostart.sh && chmod +x $HOME/.config/openbox/autostart.sh
-
-#		sudo mv /usr/share/xsessions/openbox.desktop.dis /usr/share/xsessions/openbox.desktop
-#		$change "s/user-session=/user-session=Openbox/g" /etc/lightdm/lightdm.conf
-#		mkdir -p $HOME/.config/openbox/ && echo "export DISPLAY=:0" >> $HOME/.config/openbox/autostart.sh && echo "xsetroot -solid black &" >> $HOME/.config/openbox/autostart.sh && echo "/usr/bin/xbmc &" >> $HOME/.config/openbox/autostart.sh && chmod +x $HOME/.config/openbox/autostart.sh
-#		$repo ppa:mdeslaur/steamos
-#		$update
-#		$inst steamos-xpad-dkms
-#		$inst menu
 	   ;;
-	18)
+	14)
 	   echo "Installing OwnCloud"
 		whiptail --inputbox "Choose your username for Database Owncloud (ex: owncloud)" 10 60 "" 2> /tmp/resposta15.tmp
                 ocuser=`cat /tmp/resposta15.tmp`
@@ -412,6 +441,8 @@ do
 
 done
 
+#PERMISSIONS TO ACCESS INSTALED PROGRAMS
 sudo chmod -R 777 /opt
 
-whiptail --textbox ~/kodiserver/info.txt 22 45
+#ALL INFORMATION TO ACCESS ALL PROGRAMS
+whiptail --textbox ~/kodiserver/info 22 76
