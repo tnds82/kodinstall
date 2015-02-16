@@ -73,7 +73,7 @@ options=(1 "COUCHPOTATO " off    # any option can be set to default to "on"
          4 "MYLAR " off
          5 "XDM " off
          6 "PLEX MENU " off
-	 7 "DVB / GRAPHICS CARDS " off
+	 7 "DVB CARDS " off
          8 "TVHeadend " off
          9 "OSCAM " off
 	 10 "VDR MENU " off
@@ -199,10 +199,9 @@ do
 done
 	  ;;
 	7)
-cmd=(whiptail --separate-output --title "Drivers DVB Cards and Graphics Cards" --checklist "Select your Card" 10 50 3)
+cmd=(whiptail --separate-output --title "Drivers DVB Cards" --checklist "Select your Card" 10 50 2)
 options=(1 "Install Firmware Tevii S471 " off    # any option can be set to default to "on"
-         2 "Install Driver Sundtek " off
-         3 "Install Driver Nvidia " off)
+         2 "Install Driver Sundtek - COMMING SOON" off)
 choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
 clear
 for choice in $choices
@@ -216,10 +215,6 @@ do
             echo "Installing DVB CARD Sundtek"
                 sudo chmod 755 ~/kodiserver/sundtek/sundtek_netinst.sh
                 sudo ~/kodiserver/sundtek/sundtek_netinst.sh
-            ;;
-        3)
-            echo "Installing Driver Nvidia"
-		$inst nvidia-331-updates
             ;;
     esac
 done
