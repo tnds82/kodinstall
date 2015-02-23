@@ -79,7 +79,7 @@ options=(1 "COUCHPOTATO " off    # any option can be set to default to "on"
 	 10 "VDR MENU " off
          11 "TRANSMISSION " off
 	 12 "WEBMIN " off
-	 13 "STEAM - COMMING SOON " off
+	 13 "STEAM " off
 	 14 "OWNCLOUD" off
 	 15 "KODIServer Repository " off)
 choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
