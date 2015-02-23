@@ -66,7 +66,7 @@ username=`cat /tmp/resposta.tmp`
 whiptail --inputbox "Put yout ip KODIBuntu (ex: 10.0.1.2)" 10 60 "" 2> /tmp/resposta1.tmp
 ip=`cat /tmp/resposta1.tmp`
 
-cmd=(whiptail --separate-output  --title "PROGRAMS TO INSTALL ON KODISERVER" --checklist "Select Options:" 21 42 14)
+cmd=(whiptail --separate-output  --title "PROGRAMS TO INSTALL ON KODISERVER" --checklist "Select Options:" 22 42 15)
 options=(1 "COUCHPOTATO " off    # any option can be set to default to "on"
          2 "SICKRAGE " off
          3 "HEADPHONES " off
@@ -80,7 +80,8 @@ options=(1 "COUCHPOTATO " off    # any option can be set to default to "on"
          11 "TRANSMISSION " off
 	 12 "WEBMIN " off
 	 13 "STEAM - COMMING SOON " off
-	 14 "OWNCLOUD" off)
+	 14 "OWNCLOUD" off
+	 15 "KODIServer Repository " off)
 choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
 clear
 for choice in $choices
@@ -410,6 +411,21 @@ done
 		sudo cp /usr/share/xsessions/hidden/openbox.desktop /usr/share/xsessions/
 		sudo dbus-send --system --type=method_call --print-reply --dest=org.freedesktop.Accounts /org/freedesktop/Accounts/User1000 org.freedesktop.Accounts.User.SetXSession string:openbox
 		mkdir -p $HOME/.config/openbox/ && echo "export DISPLAY=:0" >> $HOME/.config/openbox/autostart.sh && echo "xsetroot -solid black &" >> $HOME/.config/openbox/autostart.sh && echo "/usr/bin/kodi &" >> $HOME/.config/openbox/autostart.sh && chmod +x $HOME/.config/openbox/autostart.sh
+		sudo mv ~/.asoundrc ~/.asoundrc.old
+	   echo "Configurin sound to Steam in KODI"
+		aplay -l
+		echo "See please your card and device and choose"
+                sleep 15s
+                whiptail --inputbox "Put the number of your card (ex: 1)" 10 60 "" 2> /tmp/resposta17.tmp
+                card=`cat /tmp/resposta17.tmp`
+                whiptail --inputbox "Put the number of your device (ex: 7)" 10 60 "" 2> /tmp/resposta18.tmp
+                device=`cat /tmp/resposta18.tmp`
+		sudo echo "# --auto-generated-- by /etc/kodi/live.d/01-make-asoundrc.sh" | sudo tee -a ~/.asoundrc
+		sudo echo ' AUTOUPDATE=True  # change this to disable updating of this file' | sudo tee -a ~/.asoundrc
+		sudo echo "defaults.pcm.!card$card" | sudo tee -a ~/.asoundrc
+		sudo echo "defaults.ctl.!card$card" | sudo tee -a ~/.asoundrc
+		sudo echo "defaults.pcm.!device$device" | sudo tee -a ~/.asoundrc
+		sudo echo "defaults.ctl.!device$device" | sudo tee -a ~/.asoundrc
 	   ;;
 	14)
 	   echo "Installing OwnCloud"
@@ -432,6 +448,12 @@ done
 		$inst mariadb-server -y
 		sudo mysql -uroot -p -e "$SQL"
 	   ;;
+        15)
+	   echo "Download and Install KODIServer Repository"
+		sudo wget https://github.com/tnds82/kodiserver.repository/raw/master/repo/kodiserver.repository/kodiserver.repository-0.0.2.zip
+		sudo mv kodiserver.repository-0.0.2.zip ~/.kodi/addons/packages
+		unzip ~/.kodi/addons/packages/kodiserver.repository-0.0.2.zip -d ~/.kodi/addons
+           ;;
     esac
 
 done
@@ -441,3 +463,4 @@ sudo chmod -R 777 /opt
 
 #ALL INFORMATION TO ACCESS ALL PROGRAMS
 whiptail --textbox ~/kodiserver/info 22 76
+
