@@ -406,16 +406,16 @@ done
 	   ;;
 	13)
 	   echo "Installing Steam"
-		$inst wmctrl
-		wget http://media.steampowered.com/client/installer/steam.deb && sudo dpkg -i steam.deb
-		sudo cp /usr/share/xsessions/hidden/openbox.desktop /usr/share/xsessions/
-		sudo dbus-send --system --type=method_call --print-reply --dest=org.freedesktop.Accounts /org/freedesktop/Accounts/User1000 org.freedesktop.Accounts.User.SetXSession string:openbox
-		mkdir -p $HOME/.config/openbox/ && echo "export DISPLAY=:0" >> $HOME/.config/openbox/autostart.sh && echo "xsetroot -solid black &" >> $HOME/.config/openbox/autostart.sh && echo "/usr/bin/kodi &" >> $HOME/.config/openbox/autostart.sh && chmod +x $HOME/.config/openbox/autostart.sh
+#		$inst wmctrl
+#		wget http://media.steampowered.com/client/installer/steam.deb && sudo dpkg -i steam.deb
+#		sudo cp /usr/share/xsessions/hidden/openbox.desktop /usr/share/xsessions/
+#		sudo dbus-send --system --type=method_call --print-reply --dest=org.freedesktop.Accounts /org/freedesktop/Accounts/User1000 org.freedesktop.Accounts.User.SetXSession string:openbox
+#		mkdir -p $HOME/.config/openbox/ && echo "export DISPLAY=:0" >> $HOME/.config/openbox/autostart.sh && echo "xsetroot -solid black &" >> $HOME/.config/openbox/autostart.sh && echo "/usr/bin/kodi &" >> $HOME/.config/openbox/autostart.sh && chmod +x $HOME/.config/openbox/autostart.sh
 		sudo mv ~/.asoundrc ~/.asoundrc.old
 	   echo "Configurin sound to Steam in KODI"
 		aplay -l
 		echo "See please your card and device and choose"
-                sleep 15s
+                read -p "Press [Enter] key to continue..."
                 whiptail --inputbox "Put the number of your card (ex: 1)" 10 60 "" 2> /tmp/resposta17.tmp
                 card=`cat /tmp/resposta17.tmp`
                 whiptail --inputbox "Put the number of your device (ex: 7)" 10 60 "" 2> /tmp/resposta18.tmp
